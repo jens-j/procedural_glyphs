@@ -23,7 +23,7 @@ class Glyphs():
     def genGlyph(self):
 
         while True:
-            length = (self.BLOCK_BITS - 2) * self.x_size // 2 * self.y_size + self.x_size // 2 + self.y_size
+            length = self.getGlyphLength()
             glyph = randint(0, 2**length - 1) & randint(0, 2**length - 1)
 
             if glyph not in self.glyphs:
@@ -33,18 +33,24 @@ class Glyphs():
             print('collision on glyph {:0{:d}x}'.format(glyph, int(ceil(length / 4))))
 
 
+    def drawLine(self, a, b, x_offset, y_offset):
+
+        self.context.move_to(x_offset + a[0] * self.scale, y_offset + a[1] * self.scale)
+        self.context.line_to(x_offset + b[0] * self.scale, y_offset + b[1] * self.scale)
+
+
     def drawBlock(self, block, x_offset, y_offset, leftEdge=False, topEdge=False, mirror=False):
 
         x = -1 if mirror else 1
 
-        if leftEdge: 
-            if block & 1:
-                self.drawLine((0, 0), (0, 1), x_offset, y_offset)
-            block >>= 1
-
-        if topEdge:
+        if topEdge: 
             if block & 1:
                 self.drawLine((0, 0), (x, 0), x_offset, y_offset)
+            block >>= 1
+
+        if leftEdge:
+            if block & 1:
+                self.drawLine((0, 0), (0, 1), x_offset, y_offset)
             block >>= 1
 
         if block & 1:
@@ -57,24 +63,15 @@ class Glyphs():
             self.drawLine((0, 1), (x, 0), x_offset, y_offset)
 
 
-    def drawLine(self, a, b, x_offset, y_offset):
-
-        self.context.move_to(x_offset + a[0] * self.scale, y_offset + a[1] * self.scale)
-        self.context.line_to(x_offset + b[0] * self.scale, y_offset + b[1] * self.scale)
-
-
     def drawGlyph(self, x_offset, y_offset, glyph=None):
 
         if glyph is None:
             glyph = self.genGlyph()
 
-        for x in range(self.x_size // 2):
-            for y in range(self.y_size):
+        for y in range(self.y_size):
+            for x in range(self.x_size // 2):
 
-                length = self.BLOCK_BITS - 1 if x == 0 else self.BLOCK_BITS - 2
-                length = length + 1 if y == 0 else length
-                block = glyph & (2**length - 1)
-                glyph >>= length
+                block = glyph >> self.getStartBit(x, y) & (2**self.getBitWidth(x, y) - 1)
 
                 self.drawBlock(block, x_offset + x * self.scale, y_offset + y * self.scale, 
                     leftEdge=(x == 0), topEdge=(y == 0))
@@ -82,5 +79,19 @@ class Glyphs():
                     leftEdge=(x == 0), topEdge=(y == 0), mirror=True)
 
 
+    def getBitWidth(self, x, y):
+
+        return self.BLOCK_BITS - 2 + (x == 0) + (y == 0)
 
 
+    def getStartBit(self, x, y):
+
+        i = x + y * self.x_size // 2
+
+        return (self.BLOCK_BITS - 2) * i + y + min(i, 5)
+
+
+    def getGlyphLength(self):
+
+        return ((self.BLOCK_BITS - 2) * self.x_size // 2 * self.y_size 
+                + self.x_size // 2 + self.y_size)

@@ -18,17 +18,16 @@ surface = cairo.PDFSurface("map.pdf",
                            ROWS * Y_SIZE * SCALE + (ROWS - 1) * Y_SPACE + 2 * BORDER)
 
 context = cairo.Context(surface)
-
-glyphs = Glyphs(context, X_SIZE, Y_SIZE, SCALE)
-
 context.set_line_cap(cairo.LineCap.ROUND)
 context.set_font_size(15)
 context.select_font_face('Arial', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 
-i = 0
+glyphs = Glyphs(context, X_SIZE, Y_SIZE, SCALE)
 
-for y in range(ROWS):
-    for x in range(COLS):
+for i in range(ROWS * COLS):
+
+        y = i // COLS
+        x = i % COLS
         
         glyphs.drawGlyph(BORDER + X_SIZE // 2 * SCALE + x * (X_SIZE * SCALE + X_SPACE),
                          BORDER + y * (Y_SIZE * SCALE + Y_SPACE), glyph=i)
@@ -41,8 +40,6 @@ for y in range(ROWS):
             BORDER + y * (Y_SIZE * SCALE + Y_SPACE) + Y_SIZE * SCALE + Y_SPACE // 2)
 
         context.show_text(text)
-        i += 1
-
 
 context.stroke()
 surface.finish()
