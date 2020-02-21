@@ -24,7 +24,6 @@ glyphs = Glyphs(context, X_SIZE, Y_SIZE, SCALE)
 
 glyph = glyphs.genGlyph()
 
-
 for y in range(ROWS):
     for x in range(COLS):
 
@@ -32,30 +31,32 @@ for y in range(ROWS):
                          BORDER + y * (Y_SIZE * SCALE + Y_SPACE), 
                          glyph=glyph)
 
-        xx = randint(0, X_SIZE // 2 - 1)
-        yy = randint(0, Y_SIZE - 1)
-        length = glyphs.getBitWidth(xx, yy)
-        startBit = glyphs.getStartBit(xx, yy)
-        mask = (2**length - 1) << startBit
+        # xx = randint(0, X_SIZE // 2 - 1)
+        # yy = randint(0, Y_SIZE - 1)
+        # length = glyphs.getBitWidth(xx, yy)
+        # startBit = glyphs.getStartBit(xx, yy)
+        # mask = (2**length - 1) << startBit
 
-        oldBlock = glyph >> startBit & mask
+        # oldBlock = (glyph & mask) >> startBit
 
-        while True:
-            newBlock = randint(0, 2**length - 1) & randint(0, 2**length - 1)
-            if newBlock != oldBlock:
-                break
+        # while True:
+        #     newBlock = randint(0, 2**length - 1) & randint(0, 2**length - 1)
+        #     if newBlock != oldBlock:
+        #         break
 
-        glyph &= ~mask
-        glyph |= newBlock << startBit
+        # glyph &= ~mask
+        # glyph |= newBlock << startBit
 
-        # print('')
-        # bit = randint(0, glyphs.getGlyphLength() - 1)
-        # print(bit)
-        # mask = 1 << bit
-        # print(hex(mask))
-        # print(hex(glyph))
-        # glyph = glyph ^ mask
-        # print(hex(glyph))
+        print('')
+        bit = randint(0, glyphs.getGlyphLength() - 1)
+        print(bit)
+        mask = 1 << bit
+        print(hex(mask))
+        print(hex(glyph))
+        glyph = glyph ^ mask
+        print(hex(glyph))
+
+
 
 context.stroke()
 surface.finish()

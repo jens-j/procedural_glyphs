@@ -71,6 +71,13 @@ class Glyphs():
         for y in range(self.y_size):
             for x in range(self.x_size // 2):
 
+                print('')
+                print('x =', x)
+                print('y =', y)
+                print('getStartBit =', self.getStartBit(x, y))
+                print('getBitWidth =', self.getBitWidth(x, y))
+
+
                 block = glyph >> self.getStartBit(x, y) & (2**self.getBitWidth(x, y) - 1)
 
                 self.drawBlock(block, x_offset + x * self.scale, y_offset + y * self.scale, 
@@ -86,9 +93,12 @@ class Glyphs():
 
     def getStartBit(self, x, y):
 
-        i = x + y * self.x_size // 2
-
-        return (self.BLOCK_BITS - 2) * i + y + min(i, 5)
+        bit = 0
+        for yy in range(self.y_size):
+            for xx in range(self.x_size // 2):
+                if xx == x and yy == y:
+                    return bit
+                bit += self.getBitWidth(xx, yy)
 
 
     def getGlyphLength(self):
